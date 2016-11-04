@@ -45,14 +45,21 @@ class SF_XHProfProfiler {
         $xhprof_data = $this->loader->stop();
         $xhprof_runs = new XHProfRuns_Default();
         $run_id = $xhprof_runs->save_run($xhprof_data, $this->namespace);
+        $run_url = $this->profile_url($run_id);
 
-        ?>
+        // show the link if logged in
+        if (is_user_logged_in()) {
+          ?>
 
-        <div style="padding: 1em;">
-            <a href="<?php echo esc_attr($this->profile_url($run_id)); ?>" target="_blank">Profiler output</a>
-        </div>
+          <div style="padding: 1em;">
+              <a href="<?php echo esc_attr($run_url); ?>" target="_blank">Profiler output</a>
+          </div>
 
-        <?php
+          <?php
+        }
+
+        // log the url
+        error_log("XHProf Run $run_id: $run_url");
     }
 }
 
