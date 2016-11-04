@@ -5,7 +5,12 @@ class SF_XHProfLoader {
 
     function xhprof_is_enabled()
     {
+      if (PHP_VERSION_ID < 50600) {
         return extension_loaded('xhprof');
+      }
+      else {
+        return extension_loaded('xhprof') && extension_loaded('tideways');
+      }
     }
 
     function should_profile_current_request()
@@ -35,11 +40,16 @@ class SF_XHProfLoader {
     {
         if (!$this->xhprof_is_enabled())
         {
-            error_log('Failed to start profiling, the xhprof is not loaded.');
+            error_log('Failed to start profiling, the xhprof extension is not loaded. NOTE: the tideways extension is required for PHP 5.6+');
             return;
         }
 
-        xhprof_enable($this->flags(), $this->options());
+        $fn = 'tideways_enable';
+        if (!function_exists($fn)) {
+          $fn = 'xhprof_enable';
+        }
+
+        $fn($this->flags(), $this->options());
 
         $this->started = true;
     }
@@ -51,7 +61,11 @@ class SF_XHProfLoader {
 
     function stop()
     {
-        return xhprof_disable();
+        $fn = 'tideways_disable';
+        if (!function_exists($fn)) {
+          $fn = 'xhprof_disable';
+        }
+        return $fn();
     }
 }
 

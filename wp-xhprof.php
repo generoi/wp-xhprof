@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: WP XHProf
+Plugin Name: WP XHProf-Tideways
 Description: Allows profiling WordPress using Facebook's XHProf Profiler extension.
 Version: 0.1
-Author: Stefan Fisk
+Author: Stefan Fisk - 'Mucked about with' by Sut3kh
 Author URI: http://stefanfisk.com
 License: MIT
 */
@@ -54,6 +54,6 @@ class SF_XHProfProfiler {
 
         <?php
     }
-} 
+}
 
 new SF_XHProfProfiler();
