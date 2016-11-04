@@ -10,7 +10,7 @@ License: MIT
 
 class SF_XHProfProfiler {
     private $loader = null;
-    private $namespace = 'oliverocheva';
+    private $namespace = 'wp-xhprof-tideways';
 
     function __construct()
     {
