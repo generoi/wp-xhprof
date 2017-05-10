@@ -14,13 +14,18 @@ class SF_XHProfProfiler {
 
     function __construct()
     {
-        global $sf_xhprof_loader;
+        if ($this->is_runnable()) {
+            add_action('plugins_loaded', array($this, 'start_profiling'));
+            add_action('shutdown', array($this, 'stop_profiling'));
+        }
+    }
 
-        if (isset($sf_xhprof_loader)) $this->loader = $sf_xhprof_loader;
-
-        if (!$this->is_started()) return;
-
-        add_action('shutdown', array($this, 'stop_profiling'));
+    function is_runnable()
+    {
+        $is_ajax = defined('DOING_AJAX') && DOING_AJAX;
+        $is_debug = defined('WP_DEBUG') && WP_DEBUG;
+        $is_customizer = is_customize_preview();
+        return !$is_ajax && !$is_customizer && $is_debug;
     }
 
     function is_started()
@@ -37,10 +42,24 @@ class SF_XHProfProfiler {
         return plugins_url($relative_url , __FILE__ );
     }
 
+    function start_profiling()
+    {
+        include_once(__DIR__ . '/xhprof-loader.php');
+
+        global $sf_xhprof_loader;
+        if (isset($sf_xhprof_loader)) {
+            $this->loader = $sf_xhprof_loader;
+        }
+    }
+
     function stop_profiling()
     {
-        include_once('xhprof/xhprof_lib/utils/xhprof_lib.php');
-        include_once('xhprof/xhprof_lib/utils/xhprof_runs.php');
+        if (!$this->is_started()) {
+            return;
+        }
+
+        include_once(__DIR__ . '/xhprof/xhprof_lib/utils/xhprof_lib.php');
+        include_once(__DIR__ . '/xhprof/xhprof_lib/utils/xhprof_runs.php');
 
         $xhprof_data = $this->loader->stop();
         $xhprof_runs = new XHProfRuns_Default();

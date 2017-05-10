@@ -5,12 +5,12 @@ class SF_XHProfLoader {
 
     function xhprof_is_enabled()
     {
-      if (PHP_VERSION_ID < 50600) {
-        return extension_loaded('xhprof');
-      }
-      else {
-        return extension_loaded('xhprof') && extension_loaded('tideways');
-      }
+        return extension_loaded($this->get_extension());
+    }
+
+    function get_extension()
+    {
+        return PHP_VERSION_ID < 50600 ? 'xhprof' : 'tideways';
     }
 
     function should_profile_current_request()
@@ -20,6 +20,9 @@ class SF_XHProfLoader {
 
     function flags()
     {
+        if ($this->get_extension() == 'tideways') {
+            return TIDEWAYS_FLAGS_CPU | TIDEWAYS__FLAGS_MEMORY;
+        }
         return XHPROF_FLAGS_CPU | XHPROF_FLAGS_MEMORY;
     }
 
@@ -36,7 +39,7 @@ class SF_XHProfLoader {
         );
     }
 
-    function start($flags = SFHXPROF_FLAGS)
+    function start()
     {
         if (!$this->xhprof_is_enabled())
         {
@@ -44,11 +47,7 @@ class SF_XHProfLoader {
             return;
         }
 
-        $fn = 'tideways_enable';
-        if (!function_exists($fn)) {
-          $fn = 'xhprof_enable';
-        }
-
+        $fn = $this->get_extension() . '_enable';
         $fn($this->flags(), $this->options());
 
         $this->started = true;
@@ -61,10 +60,7 @@ class SF_XHProfLoader {
 
     function stop()
     {
-        $fn = 'tideways_disable';
-        if (!function_exists($fn)) {
-          $fn = 'xhprof_disable';
-        }
+        $fn = $this->get_extension() . '_disable';
         return $fn();
     }
 }
