@@ -79,8 +79,8 @@ class SF_XHProfProfiler {
             return;
         }
 
-        include_once(__DIR__ . '/xhprof/xhprof_lib/utils/xhprof_lib.php');
-        include_once(__DIR__ . '/xhprof/xhprof_lib/utils/xhprof_runs.php');
+        require_once __DIR__ . '/xhprof/xhprof_lib/utils/xhprof_lib.php';
+        require_once __DIR__ . '/xhprof/xhprof_lib/utils/xhprof_runs.php';
 
         $xhprof_data = $this->loader->stop();
         $xhprof_runs = new XHProfRuns_Default();
