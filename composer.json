@@ -1,0 +1,27 @@
+{
+  "name": "generoi/wp-xhprof",
+  "type": "wordpress-plugin",
+  "license": "MIT",
+  "description": "WP XHProf",
+  "homepage": "https://github.com/stefanfisk/wp-xhprof",
+  "authors": [
+    {
+      "name": "Stefan Fisk"
+    }
+  ],
+  "keywords": [
+    "wordpress"
+  ],
+  "support": {
+    "issues": "https://github.com/generoi/wp-xhprof/issues"
+  },
+  "require": {
+    "php": ">=5.4.0",
+    "composer/installers": "~1.0"
+  },
+  "archive" : {
+    "exclude": [
+      ".gitignore"
+    ]
+  }
+}
