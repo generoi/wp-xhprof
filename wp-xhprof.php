@@ -9,10 +9,20 @@ License: MIT
 */
 
 class SF_XHProfProfiler {
+
+    private static $instance = null;
+
     private $loader = null;
     private $namespace = 'wp-xhprof-tideways';
 
-    function __construct()
+    public static function get_instance() {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    public function init()
     {
         if ($this->is_runnable()) {
             add_action('plugins_loaded', array($this, 'start_profiling'));
@@ -20,7 +30,7 @@ class SF_XHProfProfiler {
         }
     }
 
-    function is_runnable()
+    public function is_runnable()
     {
         $is_ajax = defined('DOING_AJAX') && DOING_AJAX;
         $is_debug = defined('WP_DEBUG') && WP_DEBUG;
@@ -28,31 +38,31 @@ class SF_XHProfProfiler {
         return !$is_ajax && !$is_customizer && $is_debug;
     }
 
-    function is_started()
+    public function is_started()
     {
         return $this->loader && $this->loader->is_started();
     }
 
-    function profile_url($run_id, $namespace = null)
+    public function profile_url($run_id, $namespace = null)
     {
         if (!$namespace) $namespace = $this->namespace;
 
         $relative_url = sprintf('xhprof/xhprof_html/index.php?run=%s&source=%s', urlencode($run_id), urlencode($namespace));
 
-        return plugins_url($relative_url , __FILE__ );
+        return plugins_url($relative_url , __FILE__);
     }
 
-    function start_profiling()
+    public function start_profiling()
     {
-        include_once(__DIR__ . '/xhprof-loader.php');
+        require_once __DIR__ . '/xhprof-loader.php';
 
-        global $sf_xhprof_loader;
-        if (isset($sf_xhprof_loader)) {
-            $this->loader = $sf_xhprof_loader;
+        $this->loader = new SF_XHProfLoader();
+        if ($this->loader->should_profile_current_request()) {
+            $this->loader->start();
         }
     }
 
-    function stop_profiling()
+    public function stop_profiling()
     {
         if (!$this->is_started()) {
             return;
@@ -66,20 +76,17 @@ class SF_XHProfProfiler {
         $run_id = $xhprof_runs->save_run($xhprof_data, $this->namespace);
         $run_url = $this->profile_url($run_id);
 
-        // show the link if logged in
-        if (is_user_logged_in()) {
-          ?>
+        ?>
 
           <div style="padding: 1em;">
               <a href="<?php echo esc_attr($run_url); ?>" target="_blank">Profiler output</a>
           </div>
 
-          <?php
-        }
+        <?php
 
         // log the url
         error_log("XHProf Run $run_id: $run_url");
     }
 }
 
-new SF_XHProfProfiler();
+SF_XHProfProfiler::get_instance()->init();

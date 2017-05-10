@@ -64,7 +64,3 @@ class SF_XHProfLoader {
         return $fn();
     }
 }
-
-$sf_xhprof_loader = new SF_XHProfLoader();
-
-if ($sf_xhprof_loader->should_profile_current_request()) $sf_xhprof_loader->start();
