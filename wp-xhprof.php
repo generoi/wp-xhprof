@@ -26,6 +26,7 @@ class SF_XHProfProfiler {
     {
         if ($this->is_runnable()) {
             add_action('plugins_loaded', array($this, 'start_profiling'));
+            add_action('debug_bar_panels', [$this, 'add_debug_bar']);
             add_action('shutdown', array($this, 'stop_profiling'));
         }
     }
@@ -50,6 +51,16 @@ class SF_XHProfProfiler {
         $relative_url = sprintf('xhprof/xhprof_html/index.php?run=%s&source=%s', urlencode($run_id), urlencode($namespace));
 
         return plugins_url($relative_url , __FILE__);
+    }
+
+    public function add_debug_bar($panels)
+    {
+        if (!$this->is_started()) {
+            return $panels;
+        }
+        require_once __DIR__ . '/includes/debug-bar.php';
+        $panels[] = new Debug_Bar_WP_XHProf();
+        return $panels;
     }
 
     public function start_profiling()
