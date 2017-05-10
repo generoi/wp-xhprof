@@ -21,7 +21,7 @@ class SF_XHProfLoader {
     function flags()
     {
         if ($this->get_extension() == 'tideways') {
-            return TIDEWAYS_FLAGS_CPU | TIDEWAYS__FLAGS_MEMORY;
+            return TIDEWAYS_FLAGS_CPU | TIDEWAYS_FLAGS_MEMORY;
         }
         return XHPROF_FLAGS_CPU | XHPROF_FLAGS_MEMORY;
     }
