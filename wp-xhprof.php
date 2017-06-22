@@ -55,6 +55,7 @@ class SF_XHProfProfiler {
 
     public function add_debug_bar($panels)
     {
+        remove_action('shutdown', array($this, 'stop_profiling'));
         if (!$this->is_started()) {
             return $panels;
         }
