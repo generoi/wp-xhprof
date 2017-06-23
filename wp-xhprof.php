@@ -24,19 +24,18 @@ class SF_XHProfProfiler {
 
     public function init()
     {
-        if ($this->is_runnable()) {
-            add_action('plugins_loaded', array($this, 'start_profiling'));
-            add_action('debug_bar_panels', [$this, 'add_debug_bar']);
-            add_action('shutdown', array($this, 'stop_profiling'));
-        }
+        add_action('plugins_loaded', array($this, 'start_profiling'));
+        add_action('debug_bar_panels', [$this, 'add_debug_bar']);
+        add_action('shutdown', array($this, 'stop_profiling'));
     }
 
     public function is_runnable()
     {
         $is_ajax = defined('DOING_AJAX') && DOING_AJAX;
         $is_debug = defined('WP_DEBUG') && WP_DEBUG;
+        $is_rest = defined('REST_REQUEST') && REST_REQUEST;
         $is_customizer = is_customize_preview();
-        return !$is_ajax && !$is_customizer && $is_debug;
+        return !$is_ajax && !$is_customizer && $is_debug && !$is_rest;
     }
 
     public function is_started()
@@ -88,13 +87,15 @@ class SF_XHProfProfiler {
         $run_id = $xhprof_runs->save_run($xhprof_data, $this->namespace);
         $run_url = $this->profile_url($run_id);
 
-        ?>
+        if ($this->is_runnable()) {
+            ?>
+            <div style="padding: 1em;">
+                <a href="<?php echo esc_attr($run_url); ?>" target="_blank">Profiler output</a>
+            </div>
+            <?php
+        }
 
-          <div style="padding: 1em;">
-              <a href="<?php echo esc_attr($run_url); ?>" target="_blank">Profiler output</a>
-          </div>
 
-        <?php
 
         // log the url
         error_log("XHProf Run $run_id: $run_url");
