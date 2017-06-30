@@ -34,8 +34,9 @@ class SF_XHProfProfiler {
         $is_ajax = defined('DOING_AJAX') && DOING_AJAX;
         $is_debug = defined('WP_DEBUG') && WP_DEBUG;
         $is_rest = defined('REST_REQUEST') && REST_REQUEST;
+        $is_cli = (php_sapi_name() === 'cli');
         $is_customizer = is_customize_preview();
-        return !$is_ajax && !$is_customizer && $is_debug && !$is_rest;
+        return !$is_ajax && !$is_customizer && $is_debug && !$is_rest && !$is_cli;
     }
 
     public function is_started()
