@@ -2,7 +2,7 @@
 /*
 Plugin Name: WP XHProf-Tideways
 Description: Allows profiling WordPress using Facebook's XHProf Profiler extension.
-Version: 0.1
+Version: 0.1.5
 Author: Stefan Fisk - 'Mucked about with' by Sut3kh
 Author URI: http://stefanfisk.com
 License: MIT
@@ -14,6 +14,8 @@ class SF_XHProfProfiler {
 
     private $loader = null;
     private $namespace = 'wp-xhprof-tideways';
+    public $plugin_name = 'wp-xhprof';
+    public $github_url = 'https://github.com/generoi/wp-xhprof';
 
     public static function get_instance() {
         if (null === self::$instance) {
@@ -22,11 +24,17 @@ class SF_XHProfProfiler {
         return self::$instance;
     }
 
+    public function __construct()
+    {
+        add_action('plugins_loaded', [$this, 'start_profiling']);
+        add_action('plugins_loaded', [$this, 'init']);
+        Puc_v4_Factory::buildUpdateChecker($this->github_url, __FILE__, $this->plugin_name);
+    }
+
     public function init()
     {
-        add_action('plugins_loaded', array($this, 'start_profiling'));
         add_action('debug_bar_panels', [$this, 'add_debug_bar']);
-        add_action('shutdown', array($this, 'stop_profiling'));
+        add_action('shutdown', [$this, 'stop_profiling']);
     }
 
     public function is_runnable()
@@ -103,4 +111,8 @@ class SF_XHProfProfiler {
     }
 }
 
-SF_XHProfProfiler::get_instance()->init();
+if (file_exists($composer = __DIR__ . '/vendor/autoload.php')) {
+    require_once $composer;
+}
+
+SF_XHProfProfiler::get_instance();
