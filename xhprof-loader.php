@@ -10,7 +10,7 @@ class SF_XHProfLoader {
 
     function get_extension()
     {
-        return PHP_VERSION_ID < 50600 ? 'xhprof' : 'tideways';
+        return defined('TIDEWAYS_FLAGS_CPU') ? 'tideways' : 'xhprof';
     }
 
     function should_profile_current_request()
